@@ -84,9 +84,27 @@ h1 {
   padding: 0;
 }
 
-.banner_btn {
+.banner_btn,
+.bannerClickedBtn {
   color: #dd4c4c;
   text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bannerClickedBtn {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+#portfolioText:hover {
+  color: white;
+}
+
+.contactMeText:hover {
+  color: white;
 }
 
 .banner a p {
@@ -101,10 +119,6 @@ h1 {
 
 .banner a p:hover {
   background-color: #f48b8b;
-}
-
-.banner_btn:hover {
-  color: white;
 }
 
 .row {
