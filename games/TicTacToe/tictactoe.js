@@ -1,72 +1,60 @@
-const board = document.querySelector(".board");
-let mark;
+const board = document.querySelector('.board')
+let isDraw = false
+
+let mark
 
 for (let i = 0; i < 9; i++) {
-  const div = document.createElement("div");
-  div.classList.add("square");
-  board.appendChild(div);
+  const div = document.createElement('div')
+  div.classList.add('square')
+  board.appendChild(div)
 }
 
-const squares = Array.from(document.querySelectorAll(".square"));
+const squares = Array.from(document.querySelectorAll('.square'))
 //if true, your turn, otherwise AI's turn.
-let currentPlayer = true;
+let currentPlayer = true
 
-const checkEndOfGame = () => {
-  if (isGameOver()) {
-    console.log("it's over");
+const checkEndOfGameRemoveListeners = () => {
+  if (!isGameOver()) return
+  console.log(isDraw ? `It's a draw` : `The winner is ${mark}`)
 
-    if (isDraw()) {
-      console.log(`It's a draw`);
-    } else {
-      console.log(`The winner is: ${mark}`);
-    }
+  squares.forEach(square => {
+    square.removeEventListener('click', playerTurn)
+  })
+}
 
-    squares.forEach((square) => {
-      square.removeEventListener("click", playerTurn);
-    });
-  }
-};
+const playerTurn = e => {
+  currentPlayer ? (mark = 'X') : (mark = 'O')
+  const square = e.target
 
-const playerTurn = (e) => {
-  if (!isGameOver()) {
-    currentPlayer ? (mark = "X") : (mark = "O");
+  if (square.textContent !== '') {
+    console.log('invalid square. Try again')
+  } else {
+    square.textContent = mark
 
-    const square = e.target;
+    checkEndOfGameRemoveListeners()
+    currentPlayer = !currentPlayer
 
-    if (square.textContent !== "") {
-      console.log("invalid square. Try again");
-    } else {
-      square.textContent = mark;
-
-      checkEndOfGame();
-      currentPlayer = !currentPlayer;
-
-      if (!isGameOver()) {
-        aiMove();
-      }
+    if (!isGameOver()) {
+      aiMove()
     }
   }
-};
+}
 
 const aiMove = () => {
-  currentPlayer ? (mark = "X") : (mark = "O");
+  currentPlayer ? (mark = 'X') : (mark = 'O')
 
-  const emptySquares = squares.filter((square) => square.textContent === "");
+  const emptySquares = squares.filter(square => square.textContent === '')
 
-  const randomIndex = Math.floor(Math.random() * emptySquares.length);
-  emptySquares[randomIndex].textContent = mark;
+  const randomIndex = Math.floor(Math.random() * emptySquares.length)
+  emptySquares[randomIndex].textContent = mark
 
-  checkEndOfGame();
-  currentPlayer = !currentPlayer;
-};
+  checkEndOfGameRemoveListeners()
+  currentPlayer = !currentPlayer
+}
 
-squares.forEach((square) => {
-  square.addEventListener("click", playerTurn);
-});
-
-const isDraw = () => {
-  return squares.every((square) => square.textContent !== "");
-};
+squares.forEach(square => {
+  square.addEventListener('click', playerTurn)
+})
 
 const isGameOver = () => {
   const sq = [
@@ -78,43 +66,54 @@ const isGameOver = () => {
     [squares[2], squares[5], squares[8]],
     [squares[0], squares[4], squares[8]],
     [squares[2], squares[4], squares[6]],
-  ];
+  ]
 
-  if (isDraw()) {
-    return true;
+  if (squares.every(square => square.textContent !== '')) {
+    isDraw = true
+    return true
   }
 
-  return sq.some((cond) => {
-    console.log(cond);
-    cond.every((element) => {
-      element.textContent === "X" || element.textContent === "O";
-    });
-  });
-};
+  return sq.some(cond =>
+    cond.every(
+      element =>
+        element.textContent === 'X' ||
+        cond.every(element => element.textContent === 'O')
+    )
+  )
+}
 
 // Menu
-document.getElementById("play").addEventListener("click", function () {});
+const menuButtons = document.querySelectorAll('#menu .button')
+const menu = document.querySelector('#menu')
 
-document.getElementById("stats").addEventListener("click", function () {});
+const startGame = e => {
+  overlay.style.display = 'none'
 
-document.getElementById("settings").addEventListener("click", function () {});
+  menuButtons.forEach(button => {
+    button.style.display = 'none'
+  })
+}
 
-const menuButtons = document.querySelectorAll("#menu .button");
-const menu = document.querySelector("#menu");
+const openStats = () => {
+  console.log('open stats')
+}
 
-menuButtons.forEach(function (button) {
-  button.addEventListener("click", function () {
-    menu.style.display = "none";
-  });
-});
+const openSettings = () => {
+  console.log('open settings')
+}
 
-menuButtons.forEach(function (button) {
-  button.addEventListener("click", function () {
-    menu.style.display = "none";
-    overlay.style.display = "none";
-  });
-});
+const handleMenu = event => {
+  switch (event.target.textContent) {
+    case 'Play':
+      startGame()
+      break
+    case 'Stats':
+      openStats()
+      break
+    case 'Settings':
+      openSettings()
+      break
+  }
+}
 
-document.querySelector("#play").addEventListener("click", function () {
-  overlay.style.display = "none";
-});
+menu.addEventListener('click', handleMenu)
