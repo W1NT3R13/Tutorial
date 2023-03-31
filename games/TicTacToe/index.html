@@ -9,13 +9,28 @@
     <title>TicTacToe</title>
   </head>
   <body>
-    <div id="menu">
-      <div class="button" id="play">Play</div>
-      <div class="button" id="stats">Stats</div>
-      <div class="button" id="settings">Settings</div>
-    </div>
-    <div id="overlay"></div>
+    <div class="game">
+      <div id="menu">
+        <div class="button" id="play">Play</div>
+        <div class="button" id="stats">Stats</div>
+        <div class="button" id="settings">Settings</div>
+      </div>
 
-    <div class="board"></div>
+      <div>
+        <div id="overlay"></div>
+        <div class="boardContainer">
+          <div class="stats"></div>
+          <div class="board"></div>
+          <button class="restartBtn">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p></p>
+      </div>
+    </div>
   </body>
 </html>

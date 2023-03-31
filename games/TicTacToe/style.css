@@ -1,4 +1,8 @@
 body {
+  position: relative;
+}
+
+.game {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,6 +71,7 @@ body {
   line-height: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
+  user-select: none;
 }
 
 .button:hover {
@@ -137,4 +142,59 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
   display: block;
   z-index: 0;
+}
+
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats {
+  color: rgb(109, 214, 255);
+  font-size: 2rem;
+}
+
+.restartBtn {
+  background-color: maroon;
+  color: white;
+}
+
+.modal {
+  position: absolute;
+  display: none;
+  z-index: 2;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  border-radius: 1rem;
+  background-color: #fefefe;
+  height: 70%;
+  width: 50%;
+  border: 10px solid #888;
+}
+
+.close {
+  margin-right: 0.5rem;
+  color: #aaa;
+  float: right;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
