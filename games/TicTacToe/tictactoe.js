@@ -1,18 +1,28 @@
 const board = document.querySelector(".board");
-let isDraw = false;
-let stats = {
-  aiVictories: 0,
-  draws: 0,
-  playerVictories: 0,
-};
-
-let mark;
-//if true, your turn, otherwise AI's turn.
-let currentPlayer = true;
-
 const statContainer = document.querySelector(".stats");
 const restartButton = document.querySelector(".restartBtn");
-restartButton.addEventListener("click", restart);
+
+let stats;
+
+const getSessionStorage = () => {
+  let data = sessionStorage.getItem("gameStats");
+  stats = JSON.parse(data);
+
+  if (stats === null) {
+    stats = {
+      playerVictories: 0,
+      aiVictories: 0,
+      draws: 0,
+    };
+  }
+};
+
+getSessionStorage();
+
+let mark;
+//if true, your turn, otherwise AI's turn
+let currentPlayer = true;
+let isDraw = false;
 
 function restart() {
   mark = null;
@@ -35,6 +45,8 @@ const refreshStats = () => {
   Ai: ${stats.aiVictories}
   Draws: ${stats.draws}
 `;
+  let stringStats = JSON.stringify(stats);
+  sessionStorage.setItem("gameStats", stringStats);
 };
 
 refreshStats();
@@ -48,20 +60,21 @@ for (let i = 0; i < 9; i++) {
 const squares = Array.from(document.querySelectorAll(".square"));
 
 const checkEndOfGameRemoveListeners = () => {
-  if (!isGameOver()) return;
-  console.log(isDraw ? `It's a draw` : `The winner is ${mark}`);
+  if (isGameOver()) {
+    console.log(isDraw ? `It's a draw` : `The winner is ${mark}`);
 
-  // if (mark === "X") {
-  //   stats.playerVictories++;
-  // } else {
-  //   stats.aiVictories++;
-  // }
-  mark === "X" ? stats.playerVictories++ : stats.aiVictories++;
-  refreshStats();
+    if (isDraw) {
+      stats.draws++;
+    } else {
+      mark === "X" ? stats.playerVictories++ : stats.aiVictories++;
+    }
 
-  squares.forEach((square) => {
-    square.removeEventListener("click", playerTurn);
-  });
+    refreshStats();
+
+    squares.forEach((square) => {
+      square.removeEventListener("click", playerTurn);
+    });
+  }
 };
 
 const playerTurn = (e) => {
@@ -86,7 +99,6 @@ const aiMove = () => {
   currentPlayer ? (mark = "X") : (mark = "O");
 
   const emptySquares = squares.filter((square) => square.textContent === "");
-
   const randomIndex = Math.floor(Math.random() * emptySquares.length);
   emptySquares[randomIndex].textContent = mark;
 
@@ -110,30 +122,28 @@ const isGameOver = () => {
     [squares[2], squares[4], squares[6]],
   ];
 
-  if (squares.every((square) => square.textContent !== "")) {
-    stats.draws++;
-    refreshStats();
-    isDraw = true;
-    return true;
-  }
-
-  return sq.some((cond) =>
+  const isThereAWinner = sq.some((cond) =>
     cond.every(
       (element) =>
         element.textContent === "X" ||
         cond.every((element) => element.textContent === "O")
     )
   );
+
+  if (squares.every((square) => square.textContent !== "" && !isThereAWinner)) {
+    isDraw = true;
+    return true;
+  } else if (isThereAWinner) {
+    return true;
+  }
 };
 
 // Menu
 const menuButtons = document.querySelectorAll("#menu .button");
 const menu = document.querySelector("#menu");
+const overlay = document.querySelector("#overlay");
 
-const modal = document.getElementById("myModal");
-const close = document.getElementsByClassName("close")[0];
-
-const startGame = (e) => {
+const startGame = () => {
   overlay.style.display = "none";
 
   menuButtons.forEach((button) => {
@@ -142,18 +152,13 @@ const startGame = (e) => {
 };
 
 const openStats = () => {
-  console.log(stats);
-  // console.log(`
-  //   Player: ${stats.playerVictories}
-  //   Ai: ${stats.aiVictories}
-  //   Draws: ${stats.draws}
-  // `);
+  modalStats.style.display = "block";
+  modalStats.addEventListener("click", handleStatsModal);
 };
 
 const openSettings = () => {
-  console.log("hi");
-  modal.style.display = "block";
-  modal.addEventListener("click", handleModal);
+  modalSettings.style.display = "block";
+  modalSettings.addEventListener("click", handleSettingsModal);
 };
 
 const handleMenu = (event) => {
@@ -170,13 +175,39 @@ const handleMenu = (event) => {
   }
 };
 
-const handleModal = (event) => {
+menu.addEventListener("click", handleMenu);
+
+// Modal
+const modalSettings = document.querySelector(".settingsModal");
+const modalStats = document.querySelector(".statsModal");
+
+const handleSettingsModal = (event) => {
   switch (event.target.textContent) {
     case "×":
-      modal.removeEventListener("click", handleModal);
-      modal.style.display = "none";
+      modalSettings.removeEventListener("click", handleSettingsModal);
+      modalSettings.style.display = "none";
       break;
   }
 };
 
-menu.addEventListener("click", handleMenu);
+const handleStatsModal = (event) => {
+  const pWin = document.querySelector(".pVictories");
+  const aiWin = document.querySelector(".aVictories");
+  const draws = document.querySelector(".draws");
+
+  // const stats = Array.from(document.querySelectorAll(".stats"));
+  // stats.forEach((element) => console.log(element));
+
+  pWin.textContent = stats.playerVictories;
+  aiWin.textContent = stats.aiVictories;
+  draws.textContent = stats.draws;
+
+  switch (event.target.textContent) {
+    case "×":
+      modalStats.removeEventListener("click", handleStatsModal);
+      modalStats.style.display = "none";
+      break;
+  }
+};
+
+restartButton.addEventListener("click", () => restart());

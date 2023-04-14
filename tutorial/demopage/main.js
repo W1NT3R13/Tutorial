@@ -133,3 +133,45 @@ portfolioBtn.addEventListener("click", () => {
     portfolioBtn.classList.add("bannerClickedBtn");
   }
 });
+
+const row = document.querySelector(".row");
+row.addEventListener("click", (e) => {
+  const card = e.target.classList;
+
+  if (card[0] === "card") {
+    card.remove("card");
+    card.add("clickedCard");
+  } else if (card[0] === "clickedCard") {
+    card.remove("clickedCard");
+    card.add("card");
+  }
+
+  // switch (card[0]) {
+  //   case "card":
+  //     card.remove("card");
+  //     card.add("clickedCard");
+  //     break;
+  //   case "clickedCard":
+  //     card.remove("clickedCard");
+  //     card.add("card");
+  //     break;
+  //   default:
+  //     return;
+  // }
+});
+
+function factorial(num) {
+  if (num === 0) {
+    return 1;
+  } else {
+    return num * factorial(num - 1);
+  }
+}
+
+console.log(factorial(10));
+
+function arithmeticSeries(n) {
+  return (n / 2) * (1 + n);
+}
+
+console.log(arithmeticSeries(5));

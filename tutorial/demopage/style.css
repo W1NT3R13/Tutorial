@@ -129,13 +129,19 @@ h1 {
   width: 200px;
   height: 200px;
   display: inline-block;
-  text-align: center;
+  text-align: Center;
   margin: 1em 1em;
   border: solid 1px white;
   border-radius: 25px;
 }
 
 .row_cell img {
+  width: 80px;
+  height: auto;
+  margin: 3.65em 0 0 0;
+}
+
+.row_cellClicked img {
   width: 80px;
   height: auto;
   margin: 3.65em 0 0 0;
