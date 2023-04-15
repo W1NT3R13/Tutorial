@@ -7,7 +7,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url('https://wallpapercave.com/wp/wp8984730.jpg');
+  background-image: url("https://wallpapercave.com/wp/wp8984730.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -37,7 +37,7 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: maroon;
 }
 
@@ -149,10 +149,11 @@ body {
   flex-direction: column;
 }
 
-/*.stats {
+.stats {
   color: rgb(109, 214, 255);
   font-size: 2rem;
-}*/
+}
+
 table.darkTable {
   font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
   border: 2px solid #000000;
