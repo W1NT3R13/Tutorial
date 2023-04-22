@@ -5,6 +5,11 @@ const restartButton = document.querySelector(".restartBtn");
 let stats;
 let isModalOpen = false;
 
+let mark;
+//if true, your turn, otherwise AI's turn
+let currentPlayer = true;
+let isDraw = false;
+
 const getSessionStorage = () => {
   let data = sessionStorage.getItem("gameStats");
   stats = JSON.parse(data);
@@ -20,25 +25,24 @@ const getSessionStorage = () => {
 
 getSessionStorage();
 
-let mark;
-//if true, your turn, otherwise AI's turn
-let currentPlayer = true;
-let isDraw = false;
-
-function restart() {
+const restart = () => {
   mark = null;
   isDraw = false;
   currentPlayer = true;
 
-  squares.forEach((square) => {
-    square.removeEventListener("click", playerTurn);
-  });
+  removeSquareListeners();
 
   squares.forEach((square) => {
     square.textContent = "";
     square.addEventListener("click", playerTurn);
   });
-}
+};
+
+const removeSquareListeners = () => {
+  squares.forEach((square) => {
+    square.removeEventListener("click", playerTurn);
+  });
+};
 
 const refreshStats = () => {
   statContainer.textContent = `
@@ -71,10 +75,7 @@ const checkEndOfGameRemoveListeners = () => {
     }
 
     refreshStats();
-
-    squares.forEach((square) => {
-      square.removeEventListener("click", playerTurn);
-    });
+    removeSquareListeners();
   }
 };
 
@@ -106,10 +107,6 @@ const aiMove = () => {
   checkEndOfGameRemoveListeners();
   currentPlayer = !currentPlayer;
 };
-
-squares.forEach((square) => {
-  square.addEventListener("click", playerTurn);
-});
 
 const isGameOver = () => {
   const sq = [
@@ -144,80 +141,69 @@ const menuButtons = document.querySelectorAll("#menu .button");
 const menu = document.querySelector("#menu");
 const overlay = document.querySelector("#overlay");
 
-const startGame = () => {
-  overlay.style.display = "none";
-
-  menuButtons.forEach((button) => {
-    button.style.display = "none";
-  });
-};
-
-const openStats = () => {
+const handleOpenModal = (event) => {
   isModalOpen = true;
-  modalStats.style.display = "block";
-  modalStats.addEventListener("click", (event) =>
-    handleCloseModal(event, modalStats)
+  selectedModal = event === "Settings" ? modalSettings : modalStats;
+
+  selectedModal.style.display = "block";
+  selectedModal.addEventListener("click", (event) =>
+    handleCloseModal(event, selectedModal)
   );
 
-  const statElements = Array.from(document.querySelectorAll(".gameStats"));
-  gameStats = Object.values(stats);
+  if (event === "Stats") {
+    //Load stats
+    const statElements = Array.from(document.querySelectorAll(".gameStats"));
+    gameStats = Object.values(stats);
 
-  for (let i = 0; i < statElements.length; i++) {
-    statElements[i].textContent = gameStats[i];
+    for (let i = 0; i < statElements.length; i++) {
+      statElements[i].textContent = gameStats[i];
+    }
   }
-};
-
-const openSettings = () => {
-  isModalOpen = true;
-  modalSettings.style.display = "block";
-  modalSettings.addEventListener("click", (event) =>
-    handleCloseModal(event, modalSettings)
-  );
 };
 
 const handleMenu = (event) => {
-  switch (event.target.textContent) {
-    case "Play":
-      startGame();
-      break;
-    case "Stats":
-      openStats();
-      break;
-    case "Settings":
-      openSettings();
-      break;
-  }
+  let menuButton = event.target.textContent;
+  menuButton === "Play" ? turnMenuOnOrOff("none") : handleOpenModal(menuButton);
 };
 
-menu.addEventListener("click", handleMenu);
+const turnMenuOnOrOff = (displaySetting) => {
+  overlay.style.display = displaySetting;
+
+  menuButtons.forEach((button) => {
+    button.style.display = displaySetting;
+  });
+};
 
 // Modal
 const modalSettings = document.querySelector(".settingsModal");
 const modalStats = document.querySelector(".statsModal");
 
 const handleCloseModal = (event, modal) => {
-  isModalOpen = false;
-  if (event.target.textContent === "×") {
+  if (event.target.textContent === "×" || event.key === "Escape") {
+    isModalOpen = false;
     modal.removeEventListener("click", handleCloseModal);
     modal.style.display = "none";
   }
 };
 
+squares.forEach((square) => {
+  square.addEventListener("click", playerTurn);
+});
+
+menu.addEventListener("click", handleMenu);
+
 restartButton.addEventListener("click", () => restart());
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !isModalOpen) {
-    overlay.style.display = "block";
+  if (event.key !== "Escape") return;
 
-    menuButtons.forEach((button) => {
-      button.style.display = "block";
-    });
+  let openedModal =
+    modalSettings.style.display === "block" ? modalSettings : modalStats;
 
+  if (isModalOpen) {
+    handleCloseModal(event, openedModal);
+  } else {
+    turnMenuOnOrOff("block");
     restart();
-  } else if (event.key === "Escape" && isModalOpen) {
-    [modalSettings, modalStats].forEach((modal) => {
-      modal.style.display = "none";
-      isModalOpen = false;
-    });
   }
 });
