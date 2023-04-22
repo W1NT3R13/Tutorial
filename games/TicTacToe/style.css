@@ -172,9 +172,7 @@ table.darkTable tbody td {
   font-size: 13px;
   color: #e6e6e6;
 }
-table.darkTable tr:nth-child(even) {
-  background: #888888;
-}
+
 table.darkTable thead {
   background: #000000;
   border-bottom: 3px solid #000000;
