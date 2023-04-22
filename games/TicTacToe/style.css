@@ -236,3 +236,44 @@ table.darkTable tfoot td {
   text-decoration: none;
   cursor: pointer;
 }
+.slider-container {
+  padding-left: 1rem;
+
+}
+
+/* Style for the label element */
+.slider {
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  background-color: #ccc;
+  border-radius: 34px;
+  position: relative;
+}
+
+/* Style for the slider knob */
+.slider::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: white;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s;
+}
+
+/* Style for the checked state of the input element */
+.checkbox:checked + .slider::after {
+  left: calc(100% - 32px);
+  background-color: yellow;
+  
+}
+
+.checkbox {
+  display: none;
+  
+}

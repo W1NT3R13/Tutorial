@@ -1,27 +1,43 @@
 const board = document.querySelector(".board");
 const statContainer = document.querySelector(".stats");
 const restartButton = document.querySelector(".restartBtn");
+const settingsButton = document.querySelector(".checkbox")
 
-let stats;
+let vsAiStats;
+let vsPlayerStats;
 let isModalOpen = false;
 
 let mark;
 //if true, your turn, otherwise AI's turn
 let currentPlayer = true;
 let isDraw = false;
+let isVsAi = false;
 
 const getSessionStorage = () => {
-  let data = sessionStorage.getItem("gameStats");
-  stats = JSON.parse(data);
+  if (isVsAi) {
+  let data = sessionStorage.getItem("vsAiStats");
+  vsAiStats = JSON.parse(data);
 
-  if (stats === null) {
-    stats = {
+  if (vsAiStats === null) {
+    vsAiStats = {
       playerVictories: 0,
       aiVictories: 0,
       draws: 0,
-    };
+}}
+  } else {
+    let data = sessionStorage.getItem("vsPlayerStats");
+    vsAiStats = JSON.parse(data);
+  
+    if (vsPlayerStats === null) {
+      vsPlayerStats = {
+        player1Victories: 0,
+        player2Victories: 0,
+        draws: 0,
+      };
+    }
+   };
   }
-};
+
 
 getSessionStorage();
 
@@ -34,24 +50,35 @@ const restart = () => {
 
   squares.forEach((square) => {
     square.textContent = "";
-    square.addEventListener("click", playerTurn);
+    square.addEventListener("click", playerMove);
   });
 };
 
 const removeSquareListeners = () => {
   squares.forEach((square) => {
-    square.removeEventListener("click", playerTurn);
+    square.removeEventListener("click", playerMove);
   });
 };
 
 const refreshStats = () => {
+  if (isVsAi) {
   statContainer.textContent = `
-  Player: ${stats.playerVictories}
-  Ai: ${stats.aiVictories}
-  Draws: ${stats.draws}
-`;
-  let stringStats = JSON.stringify(stats);
-  sessionStorage.setItem("gameStats", stringStats);
+  Player: ${vsAiStats.playerVictories}
+  Ai: ${vsAiStats.aiVictories}
+  Draws: ${vsAiStats.draws}`;
+
+  let stringStats = JSON.stringify(vsAiStats);
+  sessionStorage.setItem("vsAiStats", stringStats);
+  } else {   
+    statContainer.textContent = `
+    Player1: ${vsPlayerStats.player1Victories}
+    Player2: ${vsPlayerStats.player2Victories}
+    Draws: ${vsPlayerStats.draws}`;
+
+    let stringStats = JSON.stringify(vsPlayerStats);
+    sessionStorage.setItem("vsPlayerStats", stringStats);
+  }
+
 };
 
 refreshStats();
@@ -69,9 +96,9 @@ const checkEndOfGameRemoveListeners = () => {
     console.log(isDraw ? `It's a draw` : `The winner is ${mark}`);
 
     if (isDraw) {
-      stats.draws++;
+      vsAiStats.draws++;
     } else {
-      mark === "X" ? stats.playerVictories++ : stats.aiVictories++;
+      mark === "X" ? vsAiStats.playerVictories++ : vsAiStats.aiVictories++;
     }
 
     refreshStats();
@@ -79,7 +106,7 @@ const checkEndOfGameRemoveListeners = () => {
   }
 };
 
-const playerTurn = (e) => {
+const playerMove = (e) => {
   currentPlayer ? (mark = "X") : (mark = "O");
   const square = e.target;
 
@@ -91,8 +118,10 @@ const playerTurn = (e) => {
     checkEndOfGameRemoveListeners();
     currentPlayer = !currentPlayer;
 
-    if (!isGameOver()) {
+    if (!isGameOver() && isVsAi) {
       aiMove();
+    } else if (!isGameOver() && !isVsAi) {
+      return 
     }
   }
 };
@@ -153,7 +182,7 @@ const handleOpenModal = (event) => {
   if (event === "Stats") {
     //Load stats
     const statElements = Array.from(document.querySelectorAll(".gameStats"));
-    gameStats = Object.values(stats);
+    gameStats = Object.values(vsAiStats);
 
     for (let i = 0; i < statElements.length; i++) {
       statElements[i].textContent = gameStats[i];
@@ -187,7 +216,7 @@ const handleCloseModal = (event, modal) => {
 };
 
 squares.forEach((square) => {
-  square.addEventListener("click", playerTurn);
+  square.addEventListener("click", playerMove);
 });
 
 menu.addEventListener("click", handleMenu);
@@ -207,3 +236,5 @@ document.addEventListener("keydown", (event) => {
     restart();
   }
 });
+
+settingsButton.addEventListener('click', () => isVsAi = !isVsAi);
