@@ -207,5 +207,3 @@ document.addEventListener("keydown", (event) => {
     restart();
   }
 });
-
-console.log("Mistake here");
