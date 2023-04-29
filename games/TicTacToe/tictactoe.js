@@ -3,6 +3,7 @@ const statContainer = document.querySelector(".stats");
 const restartButton = document.querySelector(".restartBtn");
 const settingsButton = document.querySelector(".checkbox");
 
+let stats;
 let vsAiStats;
 let vsPlayerStats;
 let isModalOpen = false;
@@ -13,30 +14,35 @@ let currentPlayer = true;
 let isDraw = false;
 let isVsAi = false;
 
+let statsHeaders = {
+  versusAi: ["Player", "Ai", "Draws"],
+  versusPlayer: ["Player I", "Player II", "Draws"],
+};
+
 const getSessionStorage = () => {
-  if (isVsAi) {
-    let data = sessionStorage.getItem("vsAiStats");
-    vsAiStats = JSON.parse(data);
+  let vsAiData = sessionStorage.getItem("vsAiStats");
+  vsAiStats = JSON.parse(vsAiData);
 
-    if (vsAiStats === null) {
-      vsAiStats = {
-        playerVictories: 0,
-        aiVictories: 0,
-        draws: 0,
-      };
-    }
-  } else {
-    let data = sessionStorage.getItem("vsPlayerStats");
-    vsAiStats = JSON.parse(data);
+  let vsPlayerData = sessionStorage.getItem("vsPlayerStats");
+  vsPlayerStats = JSON.parse(vsPlayerData);
 
-    if (vsPlayerStats === null) {
-      vsPlayerStats = {
-        player1Victories: 0,
-        player2Victories: 0,
-        draws: 0,
-      };
-    }
+  if (vsAiStats === null) {
+    vsAiStats = {
+      p1Wins: 0,
+      p2Wins: 0,
+      draws: 0,
+    };
   }
+
+  if (vsPlayerStats === null) {
+    vsPlayerStats = {
+      p1Wins: 0,
+      p2Wins: 0,
+      draws: 0,
+    };
+  }
+
+  stats = isVsAi ? vsAiStats : vsPlayerStats;
 };
 
 getSessionStorage();
@@ -61,23 +67,16 @@ const removeSquareListeners = () => {
 };
 
 const refreshStats = () => {
-  if (isVsAi) {
-    statContainer.textContent = `
-  Player: ${vsAiStats.playerVictories}
-  Ai: ${vsAiStats.aiVictories}
-  Draws: ${vsAiStats.draws}`;
+  statContainer.textContent = `
+  ${isVsAi ? "Player" : "Player I"}: ${stats.p1Wins}
+  ${isVsAi ? "Ai" : "Player II"}: ${stats.p2Wins}
+  Draws: ${stats.draws}`;
 
-    let stringStats = JSON.stringify(vsAiStats);
-    sessionStorage.setItem("vsAiStats", stringStats);
-  } else {
-    statContainer.textContent = `
-    Player1: ${vsPlayerStats.player1Victories}
-    Player2: ${vsPlayerStats.player2Victories}
-    Draws: ${vsPlayerStats.draws}`;
-
-    let stringStats = JSON.stringify(vsPlayerStats);
-    sessionStorage.setItem("vsPlayerStats", stringStats);
-  }
+  let stringStats = JSON.stringify(stats);
+  sessionStorage.setItem(
+    `${isVsAi ? "vsAiStats" : "vsPlayerStats"}`,
+    stringStats
+  );
 };
 
 refreshStats();
@@ -92,13 +91,7 @@ const squares = Array.from(document.querySelectorAll(".square"));
 
 const checkEndOfGameRemoveListeners = () => {
   if (isGameOver()) {
-    console.log(isDraw ? `It's a draw` : `The winner is ${mark}`);
-
-    if (isDraw) {
-      vsAiStats.draws++;
-    } else {
-      mark === "X" ? vsAiStats.playerVictories++ : vsAiStats.aiVictories++;
-    }
+    isDraw ? stats.draws++ : mark === "X" ? stats.p1Wins++ : stats.p2Wins++;
 
     refreshStats();
     removeSquareListeners();
@@ -181,9 +174,17 @@ const handleOpenModal = (event) => {
   if (event === "Stats") {
     //Load stats
     const statElements = Array.from(document.querySelectorAll(".gameStats"));
-    gameStats = Object.values(vsAiStats);
+    const tableHeaders = Array.from(
+      document.querySelectorAll(".statsTableHead")
+    );
+
+    stats = isVsAi ? vsAiStats : vsPlayerStats;
+    let gameStats = Object.values(stats);
+
+    let headers = isVsAi ? statsHeaders.versusAi : statsHeaders.versusPlayer;
 
     for (let i = 0; i < statElements.length; i++) {
+      tableHeaders[i].textContent = headers[i];
       statElements[i].textContent = gameStats[i];
     }
   }
@@ -234,4 +235,10 @@ document.addEventListener("keydown", (event) => {
     turnMenuOnOrOff("block");
     restart();
   }
+});
+
+settingsButton.addEventListener("click", () => {
+  isVsAi = !isVsAi;
+  stats = isVsAi ? vsAiStats : vsPlayerStats;
+  refreshStats();
 });
