@@ -1,7 +1,7 @@
 const board = document.querySelector(".board");
 const statContainer = document.querySelector(".stats");
 const restartButton = document.querySelector(".restartBtn");
-const settingsButton = document.querySelector(".checkbox")
+const settingsButton = document.querySelector(".checkbox");
 
 let vsAiStats;
 let vsPlayerStats;
@@ -15,19 +15,20 @@ let isVsAi = false;
 
 const getSessionStorage = () => {
   if (isVsAi) {
-  let data = sessionStorage.getItem("vsAiStats");
-  vsAiStats = JSON.parse(data);
+    let data = sessionStorage.getItem("vsAiStats");
+    vsAiStats = JSON.parse(data);
 
-  if (vsAiStats === null) {
-    vsAiStats = {
-      playerVictories: 0,
-      aiVictories: 0,
-      draws: 0,
-}}
+    if (vsAiStats === null) {
+      vsAiStats = {
+        playerVictories: 0,
+        aiVictories: 0,
+        draws: 0,
+      };
+    }
   } else {
     let data = sessionStorage.getItem("vsPlayerStats");
     vsAiStats = JSON.parse(data);
-  
+
     if (vsPlayerStats === null) {
       vsPlayerStats = {
         player1Victories: 0,
@@ -35,9 +36,8 @@ const getSessionStorage = () => {
         draws: 0,
       };
     }
-   };
   }
-
+};
 
 getSessionStorage();
 
@@ -62,14 +62,14 @@ const removeSquareListeners = () => {
 
 const refreshStats = () => {
   if (isVsAi) {
-  statContainer.textContent = `
+    statContainer.textContent = `
   Player: ${vsAiStats.playerVictories}
   Ai: ${vsAiStats.aiVictories}
   Draws: ${vsAiStats.draws}`;
 
-  let stringStats = JSON.stringify(vsAiStats);
-  sessionStorage.setItem("vsAiStats", stringStats);
-  } else {   
+    let stringStats = JSON.stringify(vsAiStats);
+    sessionStorage.setItem("vsAiStats", stringStats);
+  } else {
     statContainer.textContent = `
     Player1: ${vsPlayerStats.player1Victories}
     Player2: ${vsPlayerStats.player2Victories}
@@ -78,7 +78,6 @@ const refreshStats = () => {
     let stringStats = JSON.stringify(vsPlayerStats);
     sessionStorage.setItem("vsPlayerStats", stringStats);
   }
-
 };
 
 refreshStats();
@@ -121,7 +120,7 @@ const playerMove = (e) => {
     if (!isGameOver() && isVsAi) {
       aiMove();
     } else if (!isGameOver() && !isVsAi) {
-      return 
+      return;
     }
   }
 };
@@ -236,5 +235,3 @@ document.addEventListener("keydown", (event) => {
     restart();
   }
 });
-
-settingsButton.addEventListener('click', () => isVsAi = !isVsAi);
